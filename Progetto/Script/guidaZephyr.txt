@@ -1,0 +1,50 @@
+1)Nella cartella runphi mettete i due file forniti in questi path:
+ - /home/stefano/Scrivania/runphi/environment/qemu/jailhouse/install/root/scripts_jailhouse_qemu/config_net.sh
+ - /home/stefano/Scrivania/runphi/environment/qemu/jailhouse/install/etc/dhcp/dhcpd.conf
+ La cartella /etc/dhcp/ a me non esisteva, l'ho creata io e qui fate attenzione che i due file
+ abbianno tutti i permessi sbloccati prima di proseguire, tasto destro permessi date lettura e scrittura a tutti
+ e spunta "permetti di eseguire come programma"
+
+2)In un nuovo terminale lanciare lo script start_qemu.sh con i permessi sudo ed inserite user e password
+
+3)In un nuovo terminale HOST entra nella cartella runphi e usa lo script /scripts/remote/load_install_dir_to_remote.sh
+
+4)Esci dalla macchina qemu con la combinazione Ctrl+a -> X
+
+5)Modificare lo script start_qemu.sh sostituendo l'istruzione "netdev user,id=mynet0,restrict=off,hostfwd=tcp::5022-:22" con:
+ netdev tap,id=mynet0,ifname=tap0,script=no,downscript=no
+ 
+6)In un nuovo terminale installare i pacchetti necessari con il comando:
+ sudo apt-get install bridge-utils dnsmasq
+
+[I comandi da 1 a 6 non vanno più ripetuti]
+
+7)Lanciare lo script setup_bridge.sh con i permessi sudo
+
+8)In un nuovo terminale lanciare lo script start_qemu.sh, attendete ed inserite user e password
+
+9)In quemu entrate nella cartella scripts_jailhouse_qemu e lanciate lo script "jailhouse_start.sh"
+
+10)In un nuovo terminale (con permessi di sudo) collegatevi con l'istruzione:
+ ssh root@192.0.3.76  (192.0.3.76 è l'indirizzo IP dell'interfaccia eth0 in qemu)
+
+11)Inserite la password ed entrate nella cartella scripts_jailhouse_qemu, da qui lanciate lo script "config_net.sh"
+
+12)Premete invio per lasciare in esequzione il server dhcp in backgroud
+
+13)Dalla finestra di quemu lanciare lo script "zephyr_dhcp.sh" presente nella cartella scripts_jailhouse_qemu
+
+14)Per effettuare i test con zperf lanciare su root cell il comando:
+ socat tcp-listen:5001,reuseaddr tcp:192.0.3.1:5001
+ 
+socat udp-listen:5001,reuseaddr udp:192.0.3.1:5001
+
+
+
+15)Dalla macchina linux mint fare: hostname -I, da cui ricaviamo l'indirizzo che andremo ad usare e lanciare da linux mint il comando iperf -s -p 5001 -B 192.0.3.1 -u -i 1 |tee  
+
+16)Dalla cella zephyr zperf udp upload 192.0.3.1 5001 90 1024b 2500k  (zperf tcp/udp upload/downoald ip porta durata)
+
+ping -c 3 -I br0 192.0.2.10
+
+stress-ng --class interrupt --all 1
