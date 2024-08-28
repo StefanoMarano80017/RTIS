@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Parametri
 INTERFACE=${1:-eth1}
 IP_ADDRESS=${2:-192.0.2.1/24}
