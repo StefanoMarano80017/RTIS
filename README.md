@@ -1,4 +1,4 @@
-#RTIS
+# RTIS PROJECT
 
 This folder contains material for the course “Real Time Industrial System” (RTIS) at Federico II University.
 
